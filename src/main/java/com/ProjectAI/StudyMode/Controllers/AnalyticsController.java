@@ -21,4 +21,8 @@ public class AnalyticsController {
     public ResponseEntity<?> getPetStatus(@PathVariable Long id) {
         return new ResponseEntity<>(analyticsService.getPetMood(id), HttpStatus.OK);
     }
+    @GetMapping("/ghost/{id}")
+    public ResponseEntity<?> getGhostTarget(@PathVariable Long id, @RequestParam(defaultValue = "LAST") String mode) {
+        return new ResponseEntity<>(analyticsService.getGhostDuration(id, mode), HttpStatus.OK);
+    }
 }

@@ -101,4 +101,25 @@ public class AnalyticsService {
         if (dailyAvg > 20) return "STABLE"; // Good consistency
         return "LOW_POWER";                 // Needs more charge
     }
+
+
+    public Long getGhostDuration(Long userId, String mode) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        StudySession ghostSession = null;
+
+        if ("BEST".equalsIgnoreCase(mode)) {
+            ghostSession = sessionRepository.findFirstByUserAndDurationIsNotNullOrderByDurationDesc(user).orElse(null);
+        } else {
+            // Default to LAST session
+            ghostSession = sessionRepository.findFirstByUserAndEndTimeIsNotNullOrderByEndTimeDesc(user).orElse(null);
+        }
+
+        // Return duration in seconds (database stores minutes, so convert if needed,
+        // assuming your DB stores minutes based on SessionService.java code)
+        // Looking at SessionService.java: session.setDuration(minutes);
+        // So we return minutes * 60 for the timer logic.
+        return ghostSession != null ? ghostSession.getDuration() * 60 : 0L;
+    }
 }
